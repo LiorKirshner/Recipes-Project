@@ -1,5 +1,5 @@
-// In-memory recipes array for demonstration
-const recipes = [];
+// ייבוא נתוני מתכונים מדומים
+const recipes = require("../data/recipes");
 
 // GET /api/recipes - Retrieve all recipes with optional filters
 function getAllRecipes(req, res) {
@@ -26,9 +26,27 @@ function getAllRecipes(req, res) {
   res.status(200).json(result);
 }
 
-// ...existing code for other handlers (to be implemented)...
+// Placeholder handlers for missing endpoints
+function getRecipeById(req, res) {
+  res.status(501).json({ error: "Not implemented" });
+}
+
+function createRecipe(req, res) {
+  res.status(501).json({ error: "Not implemented" });
+}
+
+function updateRecipe(req, res) {
+  res.status(501).json({ error: "Not implemented" });
+}
+
+function deleteRecipe(req, res) {
+  res.status(501).json({ error: "Not implemented" });
+}
 
 module.exports = {
   getAllRecipes,
-  // ...other handlers...
+  getRecipeById,
+  createRecipe,
+  updateRecipe,
+  deleteRecipe,
 };
