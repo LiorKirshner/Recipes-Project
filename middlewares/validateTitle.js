@@ -4,20 +4,20 @@ const S = require("fluent-json-schema");
 // סכמת title בלבד
 const titleSchema = S.object()
   .prop("title", S.string().minLength(3).maxLength(100).required())
-  .valueOf();
+  .valueOf(); // הופך ל-JSON Schema רגיל
 
 const ajv = new Ajv();
-const validateTitle = ajv.compile(titleSchema);
+const validate = ajv.compile(titleSchema);
 
 // Middleware לולידציה של title בלבד
-function validateRecipe(req, res, next) {
-  const valid = validateTitle(req.body);
+function validateTitle(req, res, next) {
+  const valid = validate(req.body);
   if (!valid) {
     return res
       .status(400)
-      .json({ error: "Invalid title", details: validateTitle.errors });
+      .json({ error: "Invalid title", details: validate.errors });
   }
   next();
 }
 
-module.exports = { validateRecipe };
+module.exports = { validateTitle };

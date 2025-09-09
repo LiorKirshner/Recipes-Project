@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/LiorKirshner/Recipes-Project#readme",
   "dependencies": {
+    "ajv": "^8.17.1",
     "express": "^5.1.0",
     "fluent-json-schema": "^6.0.0"
   }
