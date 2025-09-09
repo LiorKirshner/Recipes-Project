@@ -14,6 +14,10 @@ app.get("/", (req, res) => {
 const recipeRoutes = require("./routes/recipeRoutes");
 app.use("/api/recipes", recipeRoutes);
 
+// Error handling middleware (should be after all routes)
+const errorHandler = require("./middlewares/errorHandler");
+app.use(errorHandler);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
