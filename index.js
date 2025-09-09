@@ -5,6 +5,10 @@ const PORT = process.env.PORT || 3000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+// Logger middleware to log all incoming requests with timestamp
+const logger = require("./middlewares/logger");
+app.use(logger);
+
 // Root route
 app.get("/", (req, res) => {
   res.send("Welcome to the Recipe API!");
