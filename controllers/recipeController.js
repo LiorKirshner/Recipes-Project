@@ -69,13 +69,53 @@ function createRecipe(req, res) {
   res.status(201).json(newRecipe);
 }
 
-// Placeholder handlers for missing endpoints
+// Update all fields of a recipe by id
 function updateRecipe(req, res) {
-  res.status(501).json({ error: "Not implemented" });
+  const { id } = req.params;
+  const {
+    title,
+    description,
+    ingredients,
+    instructions,
+    cookingTime,
+    servings,
+    difficulty,
+    rating,
+  } = req.body;
+
+  const recipeIndex = recipes.findIndex((r) => r.id === id);
+  if (recipeIndex === -1) {
+    return res.status(404).json({ error: "Recipe not found" });
+  }
+
+  // עדכון כל השדות (בהנחה שוולידציה כבר בוצעה במידלוור)
+  recipes[recipeIndex] = {
+    ...recipes[recipeIndex],
+    title,
+    description,
+    ingredients,
+    instructions,
+    cookingTime,
+    servings,
+    difficulty,
+    rating: typeof rating === "number" ? rating : null,
+    // לא נוגעים ב-id וב-createdAt
+  };
+
+  console.log(`Recipe updated: ${id}`);
+  res.status(200).json(recipes[recipeIndex]);
 }
 
+// Delete a recipe by ID
 function deleteRecipe(req, res) {
-  res.status(501).json({ error: "Not implemented" });
+  const { id } = req.params;
+  const recipeIndex = recipes.findIndex((r) => r.id === id);
+  if (recipeIndex === -1) {
+    return res.status(404).json({ error: "Recipe not found" });
+  }
+  const deleted = recipes.splice(recipeIndex, 1)[0];
+  console.log(`Recipe deleted: ${id}`);
+  res.status(204).json({ message: "Recipe deleted", recipe: deleted });
 }
 
 module.exports = {
