@@ -7,6 +7,9 @@ const { validateRecipe } = require("../middlewares/validation");
 // GET all recipes
 router.get("/", recipeController.getAllRecipes);
 
+// GET recipe statistics (must come before :id route)
+router.get("/stats", recipeController.getRecipeStats);
+
 // GET a single recipe by ID
 router.get("/:id", recipeController.getRecipeById);
 
@@ -18,8 +21,5 @@ router.put("/:id", validateRecipe, recipeController.updateRecipe);
 
 // DELETE a recipe by ID
 router.delete("/:id", recipeController.deleteRecipe);
-
-// GET recipe statistics
-router.get("/stats", recipeController.getRecipeStats);
 
 module.exports = router;
