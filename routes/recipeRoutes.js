@@ -16,7 +16,6 @@ router.get("/:id", recipeController.getRecipeById);
 // POST a new recipe (with validation)
 router.post("/", validateRecipe, recipeController.createRecipe);
 
-
 // PUT (update) a recipe by ID (with validation)
 router.put("/:id", validateRecipe, recipeController.updateRecipe);
 

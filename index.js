@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Rate limiting middleware
+const rateLimiter = require("./utils/rateLimiter");
+app.use(rateLimiter);
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 
