@@ -26,11 +26,17 @@ function getAllRecipes(req, res) {
   res.status(200).json(result);
 }
 
-// Placeholder handlers for missing endpoints
+// GET /api/recipes/:id - Retrieve a single recipe by ID
 function getRecipeById(req, res) {
-  res.status(501).json({ error: "Not implemented" });
+  const { id } = req.params;
+  const recipe = recipes.find((r) => r.id === id);
+  if (!recipe) {
+    return res.status(404).json({ error: "Recipe not found" });
+  }
+  res.status(200).json(recipe);
 }
 
+// Placeholder handlers for missing endpoints
 function createRecipe(req, res) {
   res.status(501).json({ error: "Not implemented" });
 }
