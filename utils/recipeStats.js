@@ -1,10 +1,21 @@
 // Utility functions for recipe statistics
+function formatMinutesToHourMin(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = Math.round(minutes % 60);
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, "0")}`;
+  } else {
+    return `${m}M`;
+  }
+}
+
 function getRecipeStatsData(recipes) {
   const totalRecipes = recipes.length;
-  const avgCookingTime =
+  const avgCookingTimeMin =
     totalRecipes > 0
       ? recipes.reduce((sum, r) => sum + (r.cookingTime || 0), 0) / totalRecipes
       : 0;
+  const avgCookingTime = formatMinutesToHourMin(avgCookingTimeMin);
 
   // Count recipes by difficulty
   const byDifficulty = recipes.reduce((acc, r) => {
