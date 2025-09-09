@@ -50,6 +50,8 @@ function createRecipe(req, res) {
     rating,
   } = req.body;
 
+  // כאן הוולידציה כבר נעשית במידלוור
+
   const newRecipe = {
     id: uuidv4(),
     title,
@@ -63,6 +65,7 @@ function createRecipe(req, res) {
     createdAt: new Date().toISOString(),
   };
   recipes.push(newRecipe);
+  console.log(`New recipe created: ${newRecipe.title} (ID: ${newRecipe.id})`);
   res.status(201).json(newRecipe);
 }
 
