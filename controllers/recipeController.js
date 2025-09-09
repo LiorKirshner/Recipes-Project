@@ -1,5 +1,6 @@
 // ייבוא נתוני מתכונים מדומים
 const recipes = require("../data/recipes");
+const { v4: uuidv4 } = require("uuid");
 
 // GET /api/recipes - Retrieve all recipes with optional filters
 function getAllRecipes(req, res) {
@@ -36,11 +37,36 @@ function getRecipeById(req, res) {
   res.status(200).json(recipe);
 }
 
-// Placeholder handlers for missing endpoints
+// Create a new recipe
 function createRecipe(req, res) {
-  res.status(501).json({ error: "Not implemented" });
+  const {
+    title,
+    description,
+    ingredients,
+    instructions,
+    cookingTime,
+    servings,
+    difficulty,
+    rating,
+  } = req.body;
+
+  const newRecipe = {
+    id: uuidv4(),
+    title,
+    description,
+    ingredients,
+    instructions,
+    cookingTime,
+    servings,
+    difficulty,
+    rating: typeof rating === "number" ? rating : null,
+    createdAt: new Date().toISOString(),
+  };
+  recipes.push(newRecipe);
+  res.status(201).json(newRecipe);
 }
 
+// Placeholder handlers for missing endpoints
 function updateRecipe(req, res) {
   res.status(501).json({ error: "Not implemented" });
 }
