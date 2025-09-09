@@ -1,6 +1,7 @@
 const { getRecipeStatsData } = require("../utils/recipeStats");
 const { readRecipes, writeRecipes } = require("../utils/recipesFile");
 const { v4: uuidv4 } = require("uuid");
+const { updateRecipeRating } = require("../utils/recipeRating");
 
 // GET /api/recipes - Retrieve all recipes with optional filters
 async function getAllRecipes(req, res, next) {
@@ -168,6 +169,22 @@ async function getRecipeStats(req, res, next) {
   }
 }
 
+// PUT /api/recipes/rate/:id - Update recipe rating
+async function rateRecipe(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { rating } = req.body;
+    const updated = await updateRecipeRating(id, rating);
+    res.status(200).json(updated);
+  } catch (err) {
+    next({
+      statusCode: 400,
+      message: err.message || "Failed to update rating",
+      original: err,
+    });
+  }
+}
+
 module.exports = {
   getAllRecipes,
   getRecipeById,
@@ -175,4 +192,5 @@ module.exports = {
   updateRecipe,
   deleteRecipe,
   getRecipeStats,
+  rateRecipe,
 };

@@ -16,8 +16,12 @@ router.get("/:id", recipeController.getRecipeById);
 // POST a new recipe (with validation)
 router.post("/", validateRecipe, recipeController.createRecipe);
 
+
 // PUT (update) a recipe by ID (with validation)
 router.put("/:id", validateRecipe, recipeController.updateRecipe);
+
+// PUT /rate/:id - update recipe rating
+router.put("/rate/:id", recipeController.rateRecipe);
 
 // DELETE a recipe by ID
 router.delete("/:id", recipeController.deleteRecipe);
