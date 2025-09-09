@@ -22,3 +22,6 @@ yarn-error.log*
 
 # VS Code settings
 .vscode/
+ 
+# Local recipe data (do not track in git)
+data/recipes.json

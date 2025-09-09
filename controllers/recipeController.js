@@ -1,49 +1,53 @@
-// Import mock recipe data
-const recipes = require("../data/recipes");
-const { v4: uuidv4 } = require("uuid");
 const { getRecipeStatsData } = require("../utils/recipeStats");
+const { readRecipes, writeRecipes } = require("../utils/recipesFile");
+const { v4: uuidv4 } = require("uuid");
 
 // GET /api/recipes - Retrieve all recipes with optional filters
-function getAllRecipes(req, res, next) {
+async function getAllRecipes(req, res, next) {
   try {
-    let result = recipes;
+    let recipes = await readRecipes();
     const { difficulty, maxCookingTime, search } = req.query;
 
     if (difficulty) {
-      result = result.filter((r) => r.difficulty === difficulty);
+      recipes = recipes.filter((r) => r.difficulty === difficulty);
     }
     if (maxCookingTime) {
       const maxTime = Number(maxCookingTime);
       if (!isNaN(maxTime)) {
-        result = result.filter((r) => r.cookingTime <= maxTime);
+        recipes = recipes.filter((r) => r.cookingTime <= maxTime);
       }
     }
     if (search) {
       const s = search.toLowerCase();
-      result = result.filter(
+      recipes = recipes.filter(
         (r) =>
           (r.title && r.title.toLowerCase().includes(s)) ||
           (r.description && r.description.toLowerCase().includes(s))
       );
     }
-    res.status(200).json(result);
+    res.status(200).json(recipes);
   } catch (err) {
-    next({ statusCode: 500, message: "Failed to get recipes" });
+    next({ statusCode: 500, message: "Failed to get recipes", original: err });
   }
 }
 
 // GET /api/recipes/:id - Retrieve a single recipe by ID
-function getRecipeById(req, res, next) {
-  const { id } = req.params;
-  const recipe = recipes.find((r) => r.id === id);
-  if (!recipe) {
-    return next({ statusCode: 404, message: "Recipe not found" });
+async function getRecipeById(req, res, next) {
+  try {
+    const { id } = req.params;
+    const recipes = await readRecipes();
+    const recipe = recipes.find((r) => r.id === id);
+    if (!recipe) {
+      return next({ statusCode: 404, message: "Recipe not found" });
+    }
+    res.status(200).json(recipe);
+  } catch (err) {
+    next({ statusCode: 500, message: "Failed to get recipe", original: err });
   }
-  res.status(200).json(recipe);
 }
 
 // POST /api/recipes - Create a new recipe
-function createRecipe(req, res, next) {
+async function createRecipe(req, res, next) {
   try {
     const {
       title,
@@ -56,8 +60,7 @@ function createRecipe(req, res, next) {
       rating,
     } = req.body;
 
-    // Validation is handled by middleware
-
+    const recipes = await readRecipes();
     const newRecipe = {
       id: uuidv4(),
       title,
@@ -71,15 +74,20 @@ function createRecipe(req, res, next) {
       createdAt: new Date().toISOString(),
     };
     recipes.push(newRecipe);
+    await writeRecipes(recipes);
     console.log(`New recipe created: ${newRecipe.title} (ID: ${newRecipe.id})`);
     res.status(201).json(newRecipe);
   } catch (err) {
-    next({ statusCode: 500, message: "Failed to create recipe" });
+    next({
+      statusCode: 500,
+      message: "Failed to create recipe",
+      original: err,
+    });
   }
 }
 
 // PUT /api/recipes/:id - Update an existing recipe
-function updateRecipe(req, res, next) {
+async function updateRecipe(req, res, next) {
   try {
     const { id } = req.params;
     const {
@@ -93,12 +101,12 @@ function updateRecipe(req, res, next) {
       rating,
     } = req.body;
 
+    const recipes = await readRecipes();
     const recipeIndex = recipes.findIndex((r) => r.id === id);
     if (recipeIndex === -1) {
       return next({ statusCode: 404, message: "Recipe not found" });
     }
 
-    // Update all fields (validation is handled by middleware)
     recipes[recipeIndex] = {
       ...recipes[recipeIndex],
       title,
@@ -111,37 +119,52 @@ function updateRecipe(req, res, next) {
       rating: typeof rating === "number" ? rating : null,
       // id and createdAt remain unchanged
     };
-
+    await writeRecipes(recipes);
     console.log(`Recipe updated: ${id}`);
     res.status(200).json(recipes[recipeIndex]);
   } catch (err) {
-    next({ statusCode: 500, message: "Failed to update recipe" });
+    next({
+      statusCode: 500,
+      message: "Failed to update recipe",
+      original: err,
+    });
   }
 }
 
 // DELETE /api/recipes/:id - Delete a recipe by ID
-function deleteRecipe(req, res, next) {
+async function deleteRecipe(req, res, next) {
   try {
     const { id } = req.params;
+    const recipes = await readRecipes();
     const recipeIndex = recipes.findIndex((r) => r.id === id);
     if (recipeIndex === -1) {
       return next({ statusCode: 404, message: "Recipe not found" });
     }
     const deleted = recipes.splice(recipeIndex, 1)[0];
+    await writeRecipes(recipes);
     console.log(`Recipe deleted: ${id}`);
     res.status(200).json({ message: "Recipe deleted", recipe: deleted });
   } catch (err) {
-    next({ statusCode: 500, message: "Failed to delete recipe" });
+    next({
+      statusCode: 500,
+      message: "Failed to delete recipe",
+      original: err,
+    });
   }
 }
 
 // GET /api/recipes/stats - Return recipe statistics
-function getRecipeStats(req, res, next) {
+async function getRecipeStats(req, res, next) {
   try {
+    const recipes = await readRecipes();
     const stats = getRecipeStatsData(recipes);
     res.status(200).json(stats);
   } catch (err) {
-    next({ statusCode: 500, message: "Failed to get recipe stats" });
+    next({
+      statusCode: 500,
+      message: "Failed to get recipe stats",
+      original: err,
+    });
   }
 }
 
