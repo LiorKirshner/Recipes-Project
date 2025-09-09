@@ -19,4 +19,7 @@ router.put("/:id", validateRecipe, recipeController.updateRecipe);
 // DELETE a recipe by ID
 router.delete("/:id", recipeController.deleteRecipe);
 
+// GET recipe statistics
+router.get("/stats", recipeController.getRecipeStats);
+
 module.exports = router;

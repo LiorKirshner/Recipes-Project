@@ -1,6 +1,7 @@
-// ייבוא נתוני מתכונים מדומים
+// Import mock recipe data
 const recipes = require("../data/recipes");
 const { v4: uuidv4 } = require("uuid");
+const { getRecipeStatsData } = require("../utils/recipeStats");
 
 // GET /api/recipes - Retrieve all recipes with optional filters
 function getAllRecipes(req, res) {
@@ -37,7 +38,7 @@ function getRecipeById(req, res) {
   res.status(200).json(recipe);
 }
 
-// Create a new recipe
+// POST /api/recipes - Create a new recipe
 function createRecipe(req, res) {
   const {
     title,
@@ -50,7 +51,7 @@ function createRecipe(req, res) {
     rating,
   } = req.body;
 
-  // כאן הוולידציה כבר נעשית במידלוור
+  // Validation is handled by middleware
 
   const newRecipe = {
     id: uuidv4(),
@@ -69,7 +70,7 @@ function createRecipe(req, res) {
   res.status(201).json(newRecipe);
 }
 
-// Update all fields of a recipe by id
+// PUT /api/recipes/:id - Update an existing recipe
 function updateRecipe(req, res) {
   const { id } = req.params;
   const {
@@ -88,7 +89,7 @@ function updateRecipe(req, res) {
     return res.status(404).json({ error: "Recipe not found" });
   }
 
-  // עדכון כל השדות (בהנחה שוולידציה כבר בוצעה במידלוור)
+  // Update all fields (validation is handled by middleware)
   recipes[recipeIndex] = {
     ...recipes[recipeIndex],
     title,
@@ -99,14 +100,14 @@ function updateRecipe(req, res) {
     servings,
     difficulty,
     rating: typeof rating === "number" ? rating : null,
-    // לא נוגעים ב-id וב-createdAt
+    // id and createdAt remain unchanged
   };
 
   console.log(`Recipe updated: ${id}`);
   res.status(200).json(recipes[recipeIndex]);
 }
 
-// Delete a recipe by ID
+// DELETE /api/recipes/:id - Delete a recipe by ID
 function deleteRecipe(req, res) {
   const { id } = req.params;
   const recipeIndex = recipes.findIndex((r) => r.id === id);
@@ -115,7 +116,13 @@ function deleteRecipe(req, res) {
   }
   const deleted = recipes.splice(recipeIndex, 1)[0];
   console.log(`Recipe deleted: ${id}`);
-  res.status(204).json({ message: "Recipe deleted", recipe: deleted });
+  res.status(200).json({ message: "Recipe deleted", recipe: deleted });
+}
+
+// GET /api/recipes/stats - Return recipe statistics
+function getRecipeStats(req, res) {
+  const stats = getRecipeStatsData(recipes);
+  res.status(200).json(stats);
 }
 
 module.exports = {
@@ -124,4 +131,5 @@ module.exports = {
   createRecipe,
   updateRecipe,
   deleteRecipe,
+  getRecipeStats,
 };
